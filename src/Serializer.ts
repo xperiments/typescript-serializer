@@ -22,8 +22,8 @@ module io.xperiments.utils.serialize
 	 */
 	export interface ISerializable
 	{
-		writeObject( root:boolean ):any;
-		readObject( obj:any ):void;
+		writeObject():any;
+		readObject( obj:ISerializableObject ):void;
 		stringify():string;
 		parse( string:string ):void;
 	}
