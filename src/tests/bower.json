@@ -1,0 +1,18 @@
+{
+  "name": "TSSerializer",
+  "version": "0.0.0",
+  "authors": [
+    "Pedro Casaubon <xperiments@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "qunit": "~1.14.0"
+  }
+}
