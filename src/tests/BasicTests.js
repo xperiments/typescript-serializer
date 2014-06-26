@@ -9,7 +9,7 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var Serializer = io.xperiments.utils.serialize.Serializer;
-var Serialized = io.xperiments.utils.serialize.Serialized;
+var Serialized = io.xperiments.utils.serialize.Serializable;
 
 var BasicTestModel = (function (_super) {
     __extends(BasicTestModel, _super);

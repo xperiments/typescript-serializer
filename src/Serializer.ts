@@ -1,72 +1,95 @@
 module io.xperiments.utils.serialize
 {
 
+	/**
+	 * The interface any Serializable class must implement
+	 */
 	export interface ISerializableObject
 	{
 		"@serializable":string;
 	}
 
+	/**
+	 * The interface any ClassSerializer class must implement
+	 */
 	export interface ISerializerDefinition
 	{
 		"@serializer":string;
 	}
 
+	/**
+	 * The interface any Serializable class must implement
+	 */
 	export interface ISerializable
 	{
 		writeObject( root:boolean ):any;
 		readObject( obj:any ):void;
 		stringify():string;
 		parse( string:string ):void;
-
 	}
 
+	/**
+	 *	Holds information about the class serializer & keys of a Type
+	 */
 	export interface ISerializableRegister
 	{
 		keys:string[];
 		serializerData:typeof SerializerDefinition;
 	}
 
+	/**
+	 *	Holds a dictionary of ISerializableRegister
+	 */
 	export interface ISerializableRegisters
 	{
 		[key:string]:ISerializableRegister;
 	}
 
+	/**
+	 * The interface any ClassSerializer extends
+	 */
 	export class SerializerDefinition implements ISerializerDefinition
 	{
 		"@serializer":string;
 	}
 
-	export class Serialized implements ISerializable
+	/**
+	 *	The base class all serializable classes must extend
+	 */
+	export class Serializable implements ISerializable
 	{
 		/**
-		 *
-		 * @returns {any}
+		 * Serializes the current instance & returns a transportable object
+		 * @returns {ISerializableObject}
 		 */
 		public writeObject():ISerializableObject
 		{
 
 			return Serializer.writeObject( this );
 		}
+
 		/**
-		 *
+		 * Rehidrates the current instance with the values provided by the passed object
 		 * @param obj
 		 */
-		public readObject(obj:ISerializableObject):void
+		public readObject(obj:ISerializableObject):ISerializable
 		{
-			Serializer.readObject(this, obj);
+			return Serializer.readObject(this, obj);
 		}
 
 		/**
-		 *
-		 * @returns {any}
+		 * Serializes the current instance & returns a JSON string representation
+		 * @param pretty
+		 * @returns {string}
 		 */
 		public stringify( pretty:boolean = false ):string
 		{
 			return JSON.stringify( Serializer.writeObject( this ), null, pretty? 4:0 );
 		}
+
 		/**
-		 *
-		 * @returns {any}
+		 * Rehidrates the current instance with the values provided by the passed JSON string
+		 * @param string
 		 */
 		public parse( string:string ):void
 		{
@@ -75,14 +98,17 @@ module io.xperiments.utils.serialize
 
 	}
 
+	/**
+	 *
+	 */
 	export class Serializer
 	{
 		private static serializableRegisters:ISerializableRegisters = {};
 
 		/**
-		 *
+		 * Registers a class in the serializable class register
 		 * @param classContext
-		 * @param SerializerDataClass
+		 * @param SerializerDataClass {typeof SerializerDefinition}
 		 */
 		public static registerClass( classContext:()=>any, SerializerDataClass:typeof SerializerDefinition ):void
 		{
@@ -106,13 +132,13 @@ module io.xperiments.utils.serialize
 		}
 
 		/**
-		 *
+		 * Serializes the passed instance & returns a transportable object
 		 * @param instance
 		 * @returns {any}
 		 */
-		public static writeObject( instance:ISerializable ):any
+		public static writeObject( instance:ISerializable ):ISerializableObject
 		{
-			var obj:any = {};
+			var obj:any = <ISerializableObject>{};
 			var register:ISerializableRegister = Serializer.getSerializableRegister( instance );
 			register.keys.filter((key)=>{ return key.indexOf('set_')!=0 &&  key.indexOf('get_')!=0 }).forEach(( key:string )=>
 			{
@@ -124,15 +150,16 @@ module io.xperiments.utils.serialize
 		}
 
 		/**
-		 *
+		 * Rehidrates the instance with the values provided by the passed object
 		 * @param instance
 		 * @param obj
 		 */
-		public static readObject( instance:ISerializable, obj:any ):void
+		public static readObject( instance:ISerializable, obj:ISerializableObject ):ISerializable
 		{
 			var register:ISerializableRegister = Serializer.getSerializableRegister( instance );
 			Serializer.getSerializableRegister( instance ).keys
 				.forEach( ( key:string )=> Serializer.readAny( obj[key], key, instance, register.serializerData ) );
+			return instance;
 		}
 
 
@@ -197,7 +224,6 @@ module io.xperiments.utils.serialize
 			array.forEach( ( element, i )=>{
 				Serializer.readAny( element, i, resultArray, Serializer.getSerializableRegisterData( element ) );
 			});
-			//console.log('readArray array', resultArray );
 			return resultArray;
 		}
 

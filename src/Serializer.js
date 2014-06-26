@@ -3,6 +3,19 @@ var io;
     (function (xperiments) {
         (function (utils) {
             (function (serialize) {
+                
+
+                
+
+                
+
+                
+
+                
+
+                /**
+                * The interface any ClassSerializer extends
+                */
                 var SerializerDefinition = (function () {
                     function SerializerDefinition() {
                     }
@@ -10,52 +23,59 @@ var io;
                 })();
                 serialize.SerializerDefinition = SerializerDefinition;
 
-                var Serialized = (function () {
-                    function Serialized() {
+                /**
+                *	The base class all serializable classes must extend
+                */
+                var Serializable = (function () {
+                    function Serializable() {
                     }
                     /**
-                    *
-                    * @returns {any}
+                    * Serializes the current instance & returns a transportable object
+                    * @returns {ISerializableObject}
                     */
-                    Serialized.prototype.writeObject = function () {
+                    Serializable.prototype.writeObject = function () {
                         return Serializer.writeObject(this);
                     };
 
                     /**
-                    *
+                    * Rehidrates the current instance with the values provided by the passed object
                     * @param obj
                     */
-                    Serialized.prototype.readObject = function (obj) {
-                        Serializer.readObject(this, obj);
+                    Serializable.prototype.readObject = function (obj) {
+                        return Serializer.readObject(this, obj);
                     };
 
                     /**
-                    *
-                    * @returns {any}
+                    * Serializes the current instance & returns a JSON string representation
+                    * @param pretty
+                    * @returns {string}
                     */
-                    Serialized.prototype.stringify = function (pretty) {
+                    Serializable.prototype.stringify = function (pretty) {
                         if (typeof pretty === "undefined") { pretty = false; }
                         return JSON.stringify(Serializer.writeObject(this), null, pretty ? 4 : 0);
                     };
 
                     /**
-                    *
-                    * @returns {any}
+                    * Rehidrates the current instance with the values provided by the passed JSON string
+                    * @param string
                     */
-                    Serialized.prototype.parse = function (string) {
+                    Serializable.prototype.parse = function (string) {
                         Serializer.readObject(this, JSON.parse(string));
                     };
-                    return Serialized;
+                    return Serializable;
                 })();
-                serialize.Serialized = Serialized;
+                serialize.Serializable = Serializable;
 
+                /**
+                *
+                */
                 var Serializer = (function () {
                     function Serializer() {
                     }
                     /**
-                    *
+                    * Registers a class in the serializable class register
                     * @param classContext
-                    * @param SerializerDataClass
+                    * @param SerializerDataClass {typeof SerializerDefinition}
                     */
                     Serializer.registerClass = function (classContext, SerializerDataClass) {
                         // determine class global path by parsing the body of the classContext Function
@@ -75,7 +95,7 @@ var io;
                     };
 
                     /**
-                    *
+                    * Serializes the passed instance & returns a transportable object
                     * @param instance
                     * @returns {any}
                     */
@@ -94,7 +114,7 @@ var io;
                     };
 
                     /**
-                    *
+                    * Rehidrates the instance with the values provided by the passed object
                     * @param instance
                     * @param obj
                     */
@@ -103,6 +123,7 @@ var io;
                         Serializer.getSerializableRegister(instance).keys.forEach(function (key) {
                             return Serializer.readAny(obj[key], key, instance, register.serializerData);
                         });
+                        return instance;
                     };
 
                     // Private Methods
@@ -162,8 +183,6 @@ var io;
                         array.forEach(function (element, i) {
                             Serializer.readAny(element, i, resultArray, Serializer.getSerializableRegisterData(element));
                         });
-
-                        //console.log('readArray array', resultArray );
                         return resultArray;
                     };
 

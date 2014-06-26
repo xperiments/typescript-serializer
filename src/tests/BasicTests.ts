@@ -10,7 +10,7 @@
 import ISerializableObject = io.xperiments.utils.serialize.ISerializableObject;
 import ISerializerDefinition = io.xperiments.utils.serialize.ISerializerDefinition;
 import Serializer = io.xperiments.utils.serialize.Serializer;
-import Serialized = io.xperiments.utils.serialize.Serialized;
+import Serialized = io.xperiments.utils.serialize.Serializable;
 
 class BasicTestModel extends Serialized implements ISerializableObject
 {
