@@ -119,7 +119,7 @@ serializedObjectClone.readObject( serializedObject );
 console.log( serializedObjectClone ); // outputs a rehydrated User instance
 ```
 
-## Working with complex structures
+## Working with nested Serializables
 
 For now we have only serialized a simple Object but we can serialize nested Classes inside other Classes.
 
@@ -159,4 +159,19 @@ class UserAddressSerializer extends extends Serializable
 // register serializer
 Serializer.registerClass( ()=>UserAddress, UserAddressSerializer );
 
+```
+
+
+## Custom Serialization
+
+Custom serialization lets you specify how a value is writed/readed.
+To specify we need to create 2 methods in the 
+
+```typescript
+class UserSerializer
+{
+    name:string = null; // we need to init to null to this work
+    surname:string = null;
+    addresses:UserAddress[] = null;
+}
 ```

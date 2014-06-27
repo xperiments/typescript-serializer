@@ -8,8 +8,9 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+var Serializable = io.xperiments.utils.serialize.Serializable;
+
 var Serializer = io.xperiments.utils.serialize.Serializer;
-var Serialized = io.xperiments.utils.serialize.Serializable;
 
 var BasicTestModel = (function (_super) {
     __extends(BasicTestModel, _super);
@@ -19,12 +20,11 @@ var BasicTestModel = (function (_super) {
         this.arrayOfNumbers = [];
         this.arrayOfBooleans = [];
         /* custom */
-        /* custom */
         this.childModel = new BasicChildTestModel();
         this.childModelArray = [];
     }
     return BasicTestModel;
-})(Serialized);
+})(Serializable);
 
 var BasicTestModelSerializer = (function () {
     function BasicTestModelSerializer() {
@@ -53,7 +53,7 @@ var BasicChildTestModel = (function (_super) {
         this.arrayOfBooleans = [true, false, true];
     }
     return BasicChildTestModel;
-})(Serialized);
+})(Serializable);
 
 var BasicChildTestModelSerializer = (function () {
     function BasicChildTestModelSerializer() {
@@ -75,7 +75,7 @@ var CustomSerializerModel = (function (_super) {
         this.date = new Date();
     }
     return CustomSerializerModel;
-})(Serialized);
+})(Serializable);
 
 var CustomSerializerSerializer = (function () {
     function CustomSerializerSerializer() {
@@ -101,7 +101,7 @@ var CustomImageModel = (function (_super) {
         _super.apply(this, arguments);
     }
     return CustomImageModel;
-})(Serialized);
+})(Serializable);
 
 var CustomImageModelSerializer = (function () {
     function CustomImageModelSerializer() {
@@ -122,6 +122,150 @@ var CustomImageModelSerializer = (function () {
     };
     return CustomImageModelSerializer;
 })();
+
+var nested;
+(function (nested) {
+    (function (module) {
+        var NestedBasicTestModel = (function (_super) {
+            __extends(NestedBasicTestModel, _super);
+            function NestedBasicTestModel() {
+                _super.apply(this, arguments);
+                this.arrayOfStrings = [];
+                this.arrayOfNumbers = [];
+                this.arrayOfBooleans = [];
+                /* custom */
+                this.childModel = new NestedBasicChildTestModel();
+                this.childModelArray = [];
+            }
+            return NestedBasicTestModel;
+        })(Serializable);
+        module.NestedBasicTestModel = NestedBasicTestModel;
+
+        var NestedBasicTestModelSerializer = (function () {
+            function NestedBasicTestModelSerializer() {
+                this["@serializer"] = null;
+                this.string = null;
+                this.number = null;
+                this.boolean = null;
+                this.arrayOfStrings = null;
+                this.arrayOfNumbers = null;
+                this.arrayOfBooleans = null;
+                this.childModel = null;
+                this.childModelArray = null;
+            }
+            return NestedBasicTestModelSerializer;
+        })();
+        module.NestedBasicTestModelSerializer = NestedBasicTestModelSerializer;
+
+        var NestedBasicChildTestModel = (function (_super) {
+            __extends(NestedBasicChildTestModel, _super);
+            function NestedBasicChildTestModel() {
+                _super.apply(this, arguments);
+                this.string = "hello";
+                this.number = 777;
+                this.boolean = true;
+                this.arrayOfStrings = ["o", "p", "k"];
+                this.arrayOfNumbers = [222, 333, 444];
+                this.arrayOfBooleans = [true, false, true];
+            }
+            return NestedBasicChildTestModel;
+        })(Serializable);
+        module.NestedBasicChildTestModel = NestedBasicChildTestModel;
+
+        var NestedBasicChildTestModelSerializer = (function () {
+            function NestedBasicChildTestModelSerializer() {
+                this["@serializer"] = null;
+                this.string = null;
+                this.number = null;
+                this.boolean = null;
+                this.arrayOfStrings = null;
+                this.arrayOfNumbers = null;
+                this.arrayOfBooleans = null;
+            }
+            return NestedBasicChildTestModelSerializer;
+        })();
+        module.NestedBasicChildTestModelSerializer = NestedBasicChildTestModelSerializer;
+
+        var NestedCustomSerializerModel = (function (_super) {
+            __extends(NestedCustomSerializerModel, _super);
+            function NestedCustomSerializerModel() {
+                _super.apply(this, arguments);
+                this.date = new Date();
+            }
+            return NestedCustomSerializerModel;
+        })(Serializable);
+        module.NestedCustomSerializerModel = NestedCustomSerializerModel;
+
+        var NestedCustomSerializerSerializer = (function () {
+            function NestedCustomSerializerSerializer() {
+                this["@serializer"] = null;
+                this.date = new Date();
+            }
+            NestedCustomSerializerSerializer.prototype.set_date = function (date) {
+                return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('/');
+            };
+            NestedCustomSerializerSerializer.prototype.get_date = function (dateString) {
+                var dateParts = dateString.split('/');
+                var date = new Date();
+                date.setFullYear(parseInt(dateParts[0], 10));
+                date.setMonth(parseInt(dateParts[1], 10) - 1);
+                date.setDate(parseInt(dateParts[2], 10));
+                return date;
+            };
+            Object.defineProperty(NestedCustomSerializerSerializer.prototype, "pepe", {
+                get: function () {
+                    return "10";
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return NestedCustomSerializerSerializer;
+        })();
+        module.NestedCustomSerializerSerializer = NestedCustomSerializerSerializer;
+        var NestedCustomImageModel = (function (_super) {
+            __extends(NestedCustomImageModel, _super);
+            function NestedCustomImageModel() {
+                _super.apply(this, arguments);
+            }
+            return NestedCustomImageModel;
+        })(Serializable);
+        module.NestedCustomImageModel = NestedCustomImageModel;
+
+        var NestedCustomImageModelSerializer = (function () {
+            function NestedCustomImageModelSerializer() {
+                this["@serializer"] = null;
+                this.image = null;
+            }
+            NestedCustomImageModelSerializer.prototype["=>image"] = function (image) {
+                var canvas = document.createElement('canvas');
+                canvas.width = image.width;
+                canvas.height = image.height;
+                canvas.getContext('2d').drawImage(image, 0, 0);
+                return canvas.toDataURL();
+            };
+            NestedCustomImageModelSerializer.prototype["<=image"] = function (image64) {
+                var img = document.createElement('img');
+                img.src = image64;
+                return img;
+            };
+            return NestedCustomImageModelSerializer;
+        })();
+        module.NestedCustomImageModelSerializer = NestedCustomImageModelSerializer;
+        Serializer.registerClass(function () {
+            return nested.module.NestedBasicTestModel;
+        }, nested.module.NestedBasicTestModelSerializer);
+        Serializer.registerClass(function () {
+            return nested.module.NestedBasicChildTestModel;
+        }, nested.module.NestedBasicChildTestModelSerializer);
+        Serializer.registerClass(function () {
+            return nested.module.NestedCustomSerializerModel;
+        }, nested.module.NestedCustomSerializerSerializer);
+        Serializer.registerClass(function () {
+            return nested.module.NestedCustomImageModel;
+        }, nested.module.NestedCustomImageModelSerializer);
+    })(nested.module || (nested.module = {}));
+    var module = nested.module;
+})(nested || (nested = {}));
 
 Serializer.registerClass(function () {
     return BasicTestModel;
@@ -156,6 +300,35 @@ test("Cloning Simple Types [string,number,boolean,string[],number[],boolean[],Ob
 
     var copyModel = new BasicTestModel();
     copyModel.readObject(testModel.writeObject());
+
+    // Act
+    // Assert
+    equal(JSON.stringify(testModel.writeObject()), JSON.stringify(copyModel.writeObject()));
+});
+
+test("Works in Modules", function () {
+    // Arrange
+    var testModel = new nested.module.NestedBasicTestModel();
+    testModel.string = "str";
+    testModel.number = 666;
+    testModel.boolean = false;
+    testModel.arrayOfStrings = ["a", "b", "c"];
+    testModel.arrayOfNumbers = [0, 1, 2];
+    testModel.arrayOfBooleans = [false, true, false];
+
+    testModel.childModel = new nested.module.NestedBasicChildTestModel();
+    testModel.childModel.string = "Hello World!!!!";
+    for (var i = 0; i < 1; i++) {
+        var c = new nested.module.NestedBasicChildTestModel();
+        c.number = ~~Math.random() * 1000;
+        testModel.childModelArray.push(c);
+    }
+
+    var copyModel = new nested.module.NestedBasicTestModel();
+    copyModel.readObject(testModel.writeObject());
+
+    console.log(testModel.stringify(true));
+    console.log(copyModel.stringify(true));
 
     // Act
     // Assert

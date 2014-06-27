@@ -11,17 +11,15 @@ var io;
 
                 
 
-                
-
                 /**
                 * The interface any ClassSerializer extends
                 */
-                var SerializerDefinition = (function () {
-                    function SerializerDefinition() {
+                var SerializerHelper = (function () {
+                    function SerializerHelper() {
                     }
-                    return SerializerDefinition;
+                    return SerializerHelper;
                 })();
-                serialize.SerializerDefinition = SerializerDefinition;
+                serialize.SerializerHelper = SerializerHelper;
 
                 /**
                 *	The base class all serializable classes must extend
@@ -31,7 +29,7 @@ var io;
                     }
                     /**
                     * Serializes the current instance & returns a transportable object
-                    * @returns {ISerializableObject}
+                    * @returns {ISerializable}
                     */
                     Serializable.prototype.writeObject = function () {
                         return Serializer.writeObject(this);
@@ -79,7 +77,7 @@ var io;
                     */
                     Serializer.registerClass = function (classContext, SerializerDataClass) {
                         // determine class global path by parsing the body of the classContext Function
-                        var classPath = /return ([A-Za-z0-9_$]*)/g.exec(classContext.toString())[1];
+                        var classPath = /return ([A-Za-z0-9_$.]*)/g.exec(classContext.toString())[1];
 
                         // Check if class has been processed
                         if (Serializer.serializableRegisters[classPath]) {
@@ -102,9 +100,7 @@ var io;
                     Serializer.writeObject = function (instance) {
                         var obj = {};
                         var register = Serializer.getSerializableRegister(instance);
-                        register.keys.filter(function (key) {
-                            return key.indexOf('set_') != 0 && key.indexOf('get_') != 0;
-                        }).forEach(function (key) {
+                        register.keys.forEach(function (key) {
                             var value = instance[key];
                             if (!value && !Serializer.isNumeric(value))
                                 return;

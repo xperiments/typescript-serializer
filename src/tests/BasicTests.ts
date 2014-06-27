@@ -6,15 +6,15 @@
 ///<reference path="typings/qunit/qunit.d.ts"/>
 ///<reference path="../Serializer.ts"/>
 
+import ISerializable = io.xperiments.utils.serialize.ISerializable;
+import Serializable = io.xperiments.utils.serialize.Serializable;
 
-import ISerializableObject = io.xperiments.utils.serialize.ISerializableObject;
-import ISerializerDefinition = io.xperiments.utils.serialize.ISerializerDefinition;
+import ISerializerHelper = io.xperiments.utils.serialize.ISerializerHelper;
 import Serializer = io.xperiments.utils.serialize.Serializer;
-import Serialized = io.xperiments.utils.serialize.Serializable;
 
-class BasicTestModel extends Serialized implements ISerializableObject
+
+class BasicTestModel extends Serializable
 {
-	"@serializable":string;
 	/* Natives */
 	string:string;
 	number:number;
@@ -24,15 +24,13 @@ class BasicTestModel extends Serialized implements ISerializableObject
 	arrayOfBooleans:boolean[] = [];
 
 	/* custom */
-
-	/* custom */
 	childModel:BasicChildTestModel = new BasicChildTestModel();
 	childModelArray:BasicChildTestModel[] = [];
 
 }
 
 
-class BasicTestModelSerializer implements ISerializerDefinition
+class BasicTestModelSerializer implements ISerializerHelper
 {
 	"@serializer":string = null;
 	string:string = null;
@@ -50,9 +48,8 @@ class BasicTestModelSerializer implements ISerializerDefinition
 
 
 
-class BasicChildTestModel extends Serialized implements ISerializableObject
+class BasicChildTestModel extends Serializable
 {
-	"@serializable":string;
 	string:string = "hello";
 	number:number =777;
 	boolean:boolean = true;
@@ -61,7 +58,7 @@ class BasicChildTestModel extends Serialized implements ISerializableObject
 	arrayOfBooleans:boolean[] = [true,false,true];
 }
 
-class BasicChildTestModelSerializer implements ISerializerDefinition
+class BasicChildTestModelSerializer implements ISerializerHelper
 {
 	"@serializer":string = null;
 
@@ -77,13 +74,12 @@ class BasicChildTestModelSerializer implements ISerializerDefinition
 
 
 
-class CustomSerializerModel extends Serialized implements ISerializableObject
+class CustomSerializerModel extends Serializable
 {
-	"@serializable":string;
 	date:Date = new Date();
 }
 
-class CustomSerializerSerializer implements ISerializerDefinition
+class CustomSerializerSerializer implements ISerializerHelper
 {
 	"@serializer":string = null;
 	date:Date = new Date();
@@ -99,13 +95,12 @@ class CustomSerializerSerializer implements ISerializerDefinition
 	}
 
 }
-class CustomImageModel extends Serialized implements ISerializableObject
+class CustomImageModel extends Serializable
 {
-	"@serializable":string;
 	image:HTMLImageElement;
 }
 
-class CustomImageModelSerializer implements ISerializerDefinition
+class CustomImageModelSerializer implements ISerializerHelper
 {
 	"@serializer":string = null;
 	image:HTMLImageElement = null;
@@ -124,6 +119,125 @@ class CustomImageModelSerializer implements ISerializerDefinition
 		return img;
 	}
 
+}
+
+
+module nested.module
+{
+
+
+	export class NestedBasicTestModel extends Serializable
+	{
+		/* Natives */
+		string:string;
+		number:number;
+		boolean:boolean;
+		arrayOfStrings:string[] = [];
+		arrayOfNumbers:number[] = [];
+		arrayOfBooleans:boolean[] = [];
+
+		/* custom */
+		childModel:NestedBasicChildTestModel = new NestedBasicChildTestModel();
+		childModelArray:NestedBasicChildTestModel[] = [];
+
+	}
+
+
+	export class NestedBasicTestModelSerializer implements ISerializerHelper
+	{
+		"@serializer":string = null;
+		string:string = null;
+		number:number = null;
+		boolean:boolean = null;
+		arrayOfStrings:string[] = null;
+		arrayOfNumbers:number[] = null;
+		arrayOfBooleans:boolean[] = null;
+
+		childModel:NestedBasicChildTestModel = null;
+		childModelArray:NestedBasicChildTestModel[] = null;
+	}
+
+
+
+
+
+	export class NestedBasicChildTestModel extends Serializable
+	{
+		string:string = "hello";
+		number:number =777;
+		boolean:boolean = true;
+		arrayOfStrings:string[] = ["o","p","k"];
+		arrayOfNumbers:number[] = [222,333,444];
+		arrayOfBooleans:boolean[] = [true,false,true];
+	}
+
+	export class NestedBasicChildTestModelSerializer implements ISerializerHelper
+	{
+		"@serializer":string = null;
+
+		string:string = null;
+		number:number = null;
+		boolean:boolean = null;
+		arrayOfStrings:string[] = null;
+		arrayOfNumbers:number[] = null;
+		arrayOfBooleans:boolean[] = null;
+
+
+	}
+
+
+
+	export class NestedCustomSerializerModel extends Serializable
+	{
+		date:Date = new Date();
+	}
+
+	export class NestedCustomSerializerSerializer implements ISerializerHelper
+	{
+		"@serializer":string = null;
+		date:Date = new Date();
+		set_date(date:Date):string{return [ date.getFullYear(), date.getMonth()+1, date.getDate()].join('/')}
+		get_date(dateString:string):Date
+		{
+			var dateParts:string[] = dateString.split('/');
+			var date = new Date();
+			date.setFullYear( parseInt(dateParts[0],10));
+			date.setMonth( parseInt(dateParts[1],10)-1);
+			date.setDate( parseInt(dateParts[2],10));
+			return date;
+		}
+		private get pepe():string{ return "10"}
+
+	}
+	export class NestedCustomImageModel extends Serializable
+	{
+		image:HTMLImageElement;
+	}
+
+	export class NestedCustomImageModelSerializer implements ISerializerHelper
+	{
+		"@serializer":string = null;
+		image:HTMLImageElement = null;
+		"=>image"( image:HTMLImageElement ):string
+		{
+			var canvas:HTMLCanvasElement = document.createElement('canvas');
+			canvas.width = image.width;
+			canvas.height = image.height;
+			canvas.getContext('2d').drawImage( image,0,0 );
+			return canvas.toDataURL();
+		}
+		"<=image"( image64:string ):HTMLImageElement
+		{
+			var img:HTMLImageElement = document.createElement('img');
+			img.src = image64;
+			return img;
+		}
+
+	}
+	Serializer.registerClass(()=>nested.module.NestedBasicTestModel,		nested.module.NestedBasicTestModelSerializer);
+	Serializer.registerClass(()=>nested.module.NestedBasicChildTestModel,	nested.module.NestedBasicChildTestModelSerializer);
+	Serializer.registerClass(()=>nested.module.NestedCustomSerializerModel,	nested.module.NestedCustomSerializerSerializer);
+	Serializer.registerClass(()=>nested.module.NestedCustomImageModel,		nested.module.NestedCustomImageModelSerializer);
 }
 
 Serializer.registerClass(()=>{ return BasicTestModel },BasicTestModelSerializer);
@@ -155,6 +269,38 @@ test("Cloning Simple Types [string,number,boolean,string[],number[],boolean[],Ob
 		copyModel.readObject( testModel.writeObject() );
 
 
+
+	// Act
+
+	// Assert
+
+	equal(JSON.stringify(testModel.writeObject()),JSON.stringify(copyModel.writeObject()));
+});
+
+test("Works in Modules",()=>{
+	// Arrange
+	var testModel = new nested.module.NestedBasicTestModel();
+	testModel.string = "str";
+	testModel.number = 666;
+	testModel.boolean = false;
+	testModel.arrayOfStrings =["a","b","c"];
+	testModel.arrayOfNumbers =[0,1,2];
+	testModel.arrayOfBooleans =[false,true,false];
+
+	testModel.childModel = new nested.module.NestedBasicChildTestModel();
+	testModel.childModel.string = "Hello World!!!!";
+	for( var i=0; i<1; i++)
+	{
+		var c = new nested.module.NestedBasicChildTestModel();
+		c.number = ~~Math.random()*1000;
+		testModel.childModelArray.push( c )
+	}
+
+	var copyModel = new nested.module.NestedBasicTestModel();
+	copyModel.readObject( testModel.writeObject() );
+
+	console.log( testModel.stringify(true));
+	console.log( copyModel.stringify(true));
 
 	// Act
 

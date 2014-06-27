@@ -1,18 +1,9 @@
 module io.xperiments.utils.serialize
 {
-
-	/**
-	 * The interface any Serializable class must implement
-	 */
-	export interface ISerializableObject
-	{
-		"@serializable":string;
-	}
-
 	/**
 	 * The interface any ClassSerializer class must implement
 	 */
-	export interface ISerializerDefinition
+	export interface ISerializerHelper
 	{
 		"@serializer":string;
 	}
@@ -23,7 +14,7 @@ module io.xperiments.utils.serialize
 	export interface ISerializable
 	{
 		writeObject():any;
-		readObject( obj:ISerializableObject ):void;
+		readObject( obj:ISerializable ):void;
 		stringify():string;
 		parse( string:string ):void;
 	}
@@ -34,7 +25,7 @@ module io.xperiments.utils.serialize
 	export interface ISerializableRegister
 	{
 		keys:string[];
-		serializerData:typeof SerializerDefinition;
+		serializerData:typeof SerializerHelper;
 	}
 
 	/**
@@ -48,7 +39,7 @@ module io.xperiments.utils.serialize
 	/**
 	 * The interface any ClassSerializer extends
 	 */
-	export class SerializerDefinition implements ISerializerDefinition
+	export class SerializerHelper implements ISerializerHelper
 	{
 		"@serializer":string;
 	}
@@ -60,9 +51,9 @@ module io.xperiments.utils.serialize
 	{
 		/**
 		 * Serializes the current instance & returns a transportable object
-		 * @returns {ISerializableObject}
+		 * @returns {ISerializable}
 		 */
-		public writeObject():ISerializableObject
+		public writeObject():ISerializable
 		{
 
 			return Serializer.writeObject( this );
@@ -72,7 +63,7 @@ module io.xperiments.utils.serialize
 		 * Rehidrates the current instance with the values provided by the passed object
 		 * @param obj
 		 */
-		public readObject(obj:ISerializableObject):ISerializable
+		public readObject(obj:ISerializable):ISerializable
 		{
 			return Serializer.readObject(this, obj);
 		}
@@ -110,11 +101,11 @@ module io.xperiments.utils.serialize
 		 * @param classContext
 		 * @param SerializerDataClass {typeof SerializerDefinition}
 		 */
-		public static registerClass( classContext:()=>any, SerializerDataClass:typeof SerializerDefinition ):void
+		public static registerClass( classContext:()=>any, SerializerDataClass:typeof SerializerHelper ):void
 		{
 
 			// determine class global path by parsing the body of the classContext Function
-			var classPath:string = /return ([A-Za-z0-9_$]*)/g.exec(classContext.toString())[1];
+			var classPath:string = /return ([A-Za-z0-9_$.]*)/g.exec(classContext.toString())[1];
 
 			// Check if class has been processed
 			if( Serializer.serializableRegisters[ classPath ] )
@@ -136,11 +127,11 @@ module io.xperiments.utils.serialize
 		 * @param instance
 		 * @returns {any}
 		 */
-		public static writeObject( instance:ISerializable ):ISerializableObject
+		public static writeObject( instance:ISerializable ):ISerializable
 		{
-			var obj:any = <ISerializableObject>{};
+			var obj:any = <ISerializable>{};
 			var register:ISerializableRegister = Serializer.getSerializableRegister( instance );
-			register.keys.filter((key)=>{ return key.indexOf('set_')!=0 &&  key.indexOf('get_')!=0 }).forEach(( key:string )=>
+			register.keys.forEach(( key:string )=>
 			{
 				var value:any = instance[key];
 				if( !value && !Serializer.isNumeric( value )) return; // don't getSerializableProperties void/empty/undefined
@@ -154,7 +145,7 @@ module io.xperiments.utils.serialize
 		 * @param instance
 		 * @param obj
 		 */
-		public static readObject( instance:ISerializable, obj:ISerializableObject ):ISerializable
+		public static readObject( instance:ISerializable, obj:ISerializable ):ISerializable
 		{
 			var register:ISerializableRegister = Serializer.getSerializableRegister( instance );
 			Serializer.getSerializableRegister( instance ).keys
@@ -334,7 +325,7 @@ module io.xperiments.utils.serialize
 		 * @param instance
 		 * @returns {ISerializableRegister}
 		 */
-		private static getSerializableRegisterData( instance:ISerializable ):typeof SerializerDefinition
+		private static getSerializableRegisterData( instance:ISerializable ):typeof SerializerHelper
 		{
 
 			var register = Serializer.getSerializableRegister( instance );
