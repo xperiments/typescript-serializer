@@ -3,81 +3,63 @@ var io;
     (function (xperiments) {
         (function (utils) {
             (function (serialize) {
-                
-
-                
-
-                
-
-                
-
-                /**
-                * The interface any ClassSerializer extends
-                */
-                var SerializerHelper = (function () {
-                    function SerializerHelper() {
+                var SerializerDefinition = (function () {
+                    function SerializerDefinition() {
                     }
-                    return SerializerHelper;
+                    return SerializerDefinition;
                 })();
-                serialize.SerializerHelper = SerializerHelper;
+                serialize.SerializerDefinition = SerializerDefinition;
 
-                /**
-                *	The base class all serializable classes must extend
-                */
-                var Serializable = (function () {
-                    function Serializable() {
+                var Serialized = (function () {
+                    function Serialized() {
                     }
                     /**
-                    * Serializes the current instance & returns a transportable object
-                    * @returns {ISerializable}
+                    *
+                    * @returns {any}
                     */
-                    Serializable.prototype.writeObject = function () {
+                    Serialized.prototype.writeObject = function () {
                         return Serializer.writeObject(this);
                     };
 
                     /**
-                    * Rehidrates the current instance with the values provided by the passed object
+                    *
                     * @param obj
                     */
-                    Serializable.prototype.readObject = function (obj) {
-                        return Serializer.readObject(this, obj);
+                    Serialized.prototype.readObject = function (obj) {
+                        Serializer.readObject(this, obj);
                     };
 
                     /**
-                    * Serializes the current instance & returns a JSON string representation
-                    * @param pretty
-                    * @returns {string}
+                    *
+                    * @returns {any}
                     */
-                    Serializable.prototype.stringify = function (pretty) {
+                    Serialized.prototype.stringify = function (pretty) {
                         if (typeof pretty === "undefined") { pretty = false; }
                         return JSON.stringify(Serializer.writeObject(this), null, pretty ? 4 : 0);
                     };
 
                     /**
-                    * Rehidrates the current instance with the values provided by the passed JSON string
-                    * @param string
+                    *
+                    * @returns {any}
                     */
-                    Serializable.prototype.parse = function (string) {
+                    Serialized.prototype.parse = function (string) {
                         Serializer.readObject(this, JSON.parse(string));
                     };
-                    return Serializable;
+                    return Serialized;
                 })();
-                serialize.Serializable = Serializable;
+                serialize.Serialized = Serialized;
 
-                /**
-                *
-                */
                 var Serializer = (function () {
                     function Serializer() {
                     }
                     /**
-                    * Registers a class in the serializable class register
+                    *
                     * @param classContext
-                    * @param SerializerDataClass {typeof SerializerDefinition}
+                    * @param SerializerDataClass
                     */
                     Serializer.registerClass = function (classContext, SerializerDataClass) {
                         // determine class global path by parsing the body of the classContext Function
-                        var classPath = /return ([A-Za-z0-9_$.]*)/g.exec(classContext.toString())[1];
+                        var classPath = /return ([A-Za-z0-9_$]*)/g.exec(classContext.toString())[1];
 
                         // Check if class has been processed
                         if (Serializer.serializableRegisters[classPath]) {
@@ -93,14 +75,16 @@ var io;
                     };
 
                     /**
-                    * Serializes the passed instance & returns a transportable object
+                    *
                     * @param instance
                     * @returns {any}
                     */
                     Serializer.writeObject = function (instance) {
                         var obj = {};
                         var register = Serializer.getSerializableRegister(instance);
-                        register.keys.forEach(function (key) {
+                        register.keys.filter(function (key) {
+                            return key.indexOf('set_') != 0 && key.indexOf('get_') != 0;
+                        }).forEach(function (key) {
                             var value = instance[key];
                             if (!value && !Serializer.isNumeric(value))
                                 return;
@@ -110,7 +94,7 @@ var io;
                     };
 
                     /**
-                    * Rehidrates the instance with the values provided by the passed object
+                    *
                     * @param instance
                     * @param obj
                     */
@@ -119,7 +103,6 @@ var io;
                         Serializer.getSerializableRegister(instance).keys.forEach(function (key) {
                             return Serializer.readAny(obj[key], key, instance, register.serializerData);
                         });
-                        return instance;
                     };
 
                     // Private Methods
@@ -179,6 +162,8 @@ var io;
                         array.forEach(function (element, i) {
                             Serializer.readAny(element, i, resultArray, Serializer.getSerializableRegisterData(element));
                         });
+
+                        //console.log('readArray array', resultArray );
                         return resultArray;
                     };
 
@@ -300,4 +285,3 @@ var io;
     })(io.xperiments || (io.xperiments = {}));
     var xperiments = io.xperiments;
 })(io || (io = {}));
-//# sourceMappingURL=Serializer.js.map

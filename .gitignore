@@ -1,5 +1,7 @@
 .idea
-src/tests/bower_components
-*.map
-
+.baseDir
+.baseDir.js
+.baseDir.ts
+ts/tests/bower_components
+node_modules
 *.map

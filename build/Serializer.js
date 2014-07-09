@@ -11,9 +11,6 @@ var io;
 
                 
 
-                /**
-                * The interface any ClassSerializer extends
-                */
                 var SerializerHelper = (function () {
                     function SerializerHelper() {
                     }
@@ -21,42 +18,22 @@ var io;
                 })();
                 serialize.SerializerHelper = SerializerHelper;
 
-                /**
-                *	The base class all serializable classes must extend
-                */
                 var Serializable = (function () {
                     function Serializable() {
                     }
-                    /**
-                    * Serializes the current instance & returns a transportable object
-                    * @returns {ISerializable}
-                    */
                     Serializable.prototype.writeObject = function () {
                         return Serializer.writeObject(this);
                     };
 
-                    /**
-                    * Rehidrates the current instance with the values provided by the passed object
-                    * @param obj
-                    */
                     Serializable.prototype.readObject = function (obj) {
                         return Serializer.readObject(this, obj);
                     };
 
-                    /**
-                    * Serializes the current instance & returns a JSON string representation
-                    * @param pretty
-                    * @returns {string}
-                    */
                     Serializable.prototype.stringify = function (pretty) {
                         if (typeof pretty === "undefined") { pretty = false; }
                         return JSON.stringify(Serializer.writeObject(this), null, pretty ? 4 : 0);
                     };
 
-                    /**
-                    * Rehidrates the current instance with the values provided by the passed JSON string
-                    * @param string
-                    */
                     Serializable.prototype.parse = function (string) {
                         Serializer.readObject(this, JSON.parse(string));
                     };
@@ -64,22 +41,12 @@ var io;
                 })();
                 serialize.Serializable = Serializable;
 
-                /**
-                *
-                */
                 var Serializer = (function () {
                     function Serializer() {
                     }
-                    /**
-                    * Registers a class in the serializable class register
-                    * @param classContext
-                    * @param SerializerDataClass {typeof SerializerDefinition}
-                    */
                     Serializer.registerClass = function (classContext, SerializerDataClass) {
-                        // determine class global path by parsing the body of the classContext Function
                         var classPath = /return ([A-Za-z0-9_$.]*)/g.exec(classContext.toString())[1];
 
-                        // Check if class has been processed
                         if (Serializer.serializableRegisters[classPath]) {
                             throw new Error('Class ' + classPath + ' already registered');
                         }
@@ -92,11 +59,6 @@ var io;
                         };
                     };
 
-                    /**
-                    * Serializes the passed instance & returns a transportable object
-                    * @param instance
-                    * @returns {any}
-                    */
                     Serializer.writeObject = function (instance) {
                         var obj = {};
                         var register = Serializer.getSerializableRegister(instance);
@@ -109,11 +71,6 @@ var io;
                         return obj;
                     };
 
-                    /**
-                    * Rehidrates the instance with the values provided by the passed object
-                    * @param instance
-                    * @param obj
-                    */
                     Serializer.readObject = function (instance, obj) {
                         var register = Serializer.getSerializableRegister(instance);
                         Serializer.getSerializableRegister(instance).keys.forEach(function (key) {
@@ -122,12 +79,6 @@ var io;
                         return instance;
                     };
 
-                    // Private Methods
-                    /**
-                    *
-                    * @param array
-                    * @returns {any[]}
-                    */
                     Serializer.writeArray = function (array) {
                         var dummyObjectArray = { array: [] };
                         array.forEach(function (value, i) {
@@ -136,13 +87,6 @@ var io;
                         return dummyObjectArray.array;
                     };
 
-                    /**
-                    *
-                    * @param value
-                    * @param key
-                    * @param obj
-                    * @param SerializerDataClass
-                    */
                     Serializer.writeAny = function (obj, key, value, SerializerDataClass, fromArray) {
                         if (typeof SerializerDataClass === "undefined") { SerializerDataClass = null; }
                         if (typeof fromArray === "undefined") { fromArray = false; }
@@ -168,11 +112,6 @@ var io;
                         }
                     };
 
-                    /**
-                    *
-                    * @param array
-                    * @returns {any[]}
-                    */
                     Serializer.readArray = function (array) {
                         var resultArray = [];
 
@@ -182,13 +121,6 @@ var io;
                         return resultArray;
                     };
 
-                    /**
-                    *
-                    * @param element
-                    * @param key
-                    * @param target
-                    * @param SerializerDataClass
-                    */
                     Serializer.readAny = function (element, key, target, SerializerDataClass) {
                         if (SerializerDataClass && typeof SerializerDataClass.prototype["get_" + key] == "function") {
                             target[key] = SerializerDataClass.prototype["get_" + key](element);
@@ -219,31 +151,14 @@ var io;
                         }
                     };
 
-                    /* Helper Methods */
-                    /**
-                    *
-                    * @param SerializerDataClass
-                    * @returns {string[]}
-                    */
                     Serializer.getMixedNames = function (SerializerDataClass) {
                         return Object.getOwnPropertyNames(new SerializerDataClass()).concat("@serializable");
                     };
 
-                    /**
-                    *
-                    * @param instance
-                    * @returns {boolean}
-                    */
                     Serializer.isExternalizable = function (instance) {
                         return '@serializable' in instance && typeof instance.writeObject == "function" && typeof instance.readObject == "function";
                     };
 
-                    /**
-                    *
-                    * @param name
-                    * @param context
-                    * @returns {any}
-                    */
                     Serializer.getClassFromPath = function (name, context) {
                         if (typeof context === "undefined") { context = window; }
                         name.split('.').forEach(function (ctx) {
@@ -252,12 +167,6 @@ var io;
                         return context;
                     };
 
-                    /**
-                    *
-                    * @param name
-                    * @param context
-                    * @returns {any}
-                    */
                     Serializer.getClass = function (name, context) {
                         if (typeof context === "undefined") { context = window; }
                         name.split('.').forEach(function (ctx) {
@@ -266,21 +175,11 @@ var io;
                         return new context;
                     };
 
-                    /**
-                    *
-                    * @param instance
-                    * @returns {ISerializableRegister}
-                    */
                     Serializer.getSerializableRegister = function (instance) {
                         var props = Serializer.serializableRegisters[instance['@serializable']] || null;
                         return props;
                     };
 
-                    /**
-                    *
-                    * @param instance
-                    * @returns {ISerializableRegister}
-                    */
                     Serializer.getSerializableRegisterData = function (instance) {
                         var register = Serializer.getSerializableRegister(instance);
                         return register ? register.serializerData : null;
@@ -300,4 +199,3 @@ var io;
     })(io.xperiments || (io.xperiments = {}));
     var xperiments = io.xperiments;
 })(io || (io = {}));
-//# sourceMappingURL=Serializer.js.map

@@ -204,7 +204,6 @@ module io.xperiments.utils.serialize
 		}
 
 		/**
-		 *
 		 * @param array
 		 * @returns {any[]}
 		 */
@@ -219,8 +218,7 @@ module io.xperiments.utils.serialize
 		}
 
 		/**
-		 *
-		 * @param element
+		 ** @param element
 		 * @param key
 		 * @param target
 		 * @param SerializerDataClass
@@ -265,8 +263,8 @@ module io.xperiments.utils.serialize
 		/* Helper Methods */
 
 		/**
-		 *
-		 * @param SerializerDataClass
+
+		 ** @param SerializerDataClass
 		 * @returns {string[]}
 		 */
 		private static getMixedNames( SerializerDataClass:any ):string[]
@@ -276,8 +274,8 @@ module io.xperiments.utils.serialize
 
 
 		/**
-		 *
-		 * @param instance
+
+		 ** @param instance
 		 * @returns {boolean}
 		 */
 		private static isExternalizable( instance ):boolean
@@ -286,8 +284,8 @@ module io.xperiments.utils.serialize
 		}
 
 		/**
-		 *
-		 * @param name
+
+		 ** @param name
 		 * @param context
 		 * @returns {any}
 		 */
@@ -298,8 +296,8 @@ module io.xperiments.utils.serialize
 		}
 
 		/**
-		 *
-		 * @param name
+
+		 ** @param name
 		 * @param context
 		 * @returns {any}
 		 */
@@ -310,8 +308,8 @@ module io.xperiments.utils.serialize
 		}
 
 		/**
-		 *
-		 * @param instance
+
+		 		 ** @param instance
 		 * @returns {ISerializableRegister}
 		 */
 		private static getSerializableRegister( instance:ISerializable ):ISerializableRegister

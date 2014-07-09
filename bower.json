@@ -1,0 +1,17 @@
+{
+  "name": "typescript-serializer",
+  "version": "0.0.0",
+  "homepage": "https://github.com/xperiments/typescript-serializer",
+  "authors": [
+    "Pedro Casaubon <xperiments@gmail.com>"
+  ],
+  "main":"build/typescript-serializer.min.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
