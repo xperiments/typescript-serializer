@@ -356,3 +356,4 @@ test("Works in Modules", function () {
     // Assert
     equal(JSON.stringify(testModel.writeObject()), JSON.stringify(copyModel.writeObject()));
 });
+//# sourceMappingURL=BasicTests.js.map

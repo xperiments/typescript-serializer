@@ -169,7 +169,6 @@ var io;
                     };
 
                     /**
-                    *
                     * @param array
                     * @returns {any[]}
                     */
@@ -183,13 +182,13 @@ var io;
                     };
 
                     /**
-                    * @param element
+                    ** @param element
                     * @param key
                     * @param target
                     * @param SerializerDataClass
                     */
                     Serializer.readAny = function (element, key, target, SerializerDataClass) {
-                        if (SerializerDataClass && typeof SerializerDataClass.prototype["@get:" + key] == "function") {
+                        if (SerializerDataClass && typeof SerializerDataClass.prototype["get_" + key] == "function") {
                             target[key] = SerializerDataClass.prototype["get_" + key](element);
                             return;
                         }
@@ -220,7 +219,8 @@ var io;
 
                     /* Helper Methods */
                     /**
-                    * @param SerializerDataClass
+                    
+                    ** @param SerializerDataClass
                     * @returns {string[]}
                     */
                     Serializer.getMixedNames = function (SerializerDataClass) {
@@ -228,7 +228,8 @@ var io;
                     };
 
                     /**
-                    * @param instance
+                    
+                    ** @param instance
                     * @returns {boolean}
                     */
                     Serializer.isExternalizable = function (instance) {
@@ -236,7 +237,8 @@ var io;
                     };
 
                     /**
-                    * @param name
+                    
+                    ** @param name
                     * @param context
                     * @returns {any}
                     */
@@ -249,7 +251,8 @@ var io;
                     };
 
                     /**
-                    * @param name
+                    
+                    ** @param name
                     * @param context
                     * @returns {any}
                     */
@@ -263,7 +266,7 @@ var io;
 
                     /**
                     
-                    * @param instance
+                    ** @param instance
                     * @returns {ISerializableRegister}
                     */
                     Serializer.getSerializableRegister = function (instance) {
