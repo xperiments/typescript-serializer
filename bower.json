@@ -15,3 +15,4 @@
     "tests"
   ]
 }
+//bower register typescript-serializer git://github.com/xperiments/typescript-serializer.git
